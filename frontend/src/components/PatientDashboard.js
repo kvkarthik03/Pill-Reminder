@@ -93,7 +93,7 @@ const PatientDashboard = () => {
               prescriptions.map(prescription => (
                 <div key={prescription._id} className="prescription-item">
                   <h3>Prescribed on: {new Date(prescription.createdAt).toLocaleDateString()}</h3>
-                  <p><strong>Duration:</strong> {prescription.howLongToTake}</p>
+                  <p><strong>Duration:</strong> {prescription.howLongToTake} days</p>
                   {prescription.medicines.map((medicine, index) => (
                     <div key={index} className="medicine-item">
                       <h4>{medicine.drugName}</h4>

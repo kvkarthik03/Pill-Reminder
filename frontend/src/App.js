@@ -12,6 +12,7 @@ import NotificationList from './components/NotificationList';
 import ErrorBoundary from './components/ErrorBoundary';
 import DoctorProfile from './components/DoctorProfile';
 import PatientProfile from './components/PatientProfile';
+import DrugInteractionChecker from './components/DrugInteractionChecker';
 import './styles/global.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <ProtectedRoute path="/patient-dashboard" component={PatientDashboard} roleRequired="patient" />
               <ProtectedRoute path="/create-prescription" component={CreatePrescription} roleRequired="doctor" />
               <ProtectedRoute path="/notifications" component={NotificationList} />
+              <ProtectedRoute path="/drug-interactions" component={DrugInteractionChecker} roleRequired="doctor" />
               <Route path="*">
                 <Redirect to="/" />
               </Route>

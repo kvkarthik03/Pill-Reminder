@@ -52,7 +52,10 @@ const Navigation = () => {
               Dashboard
             </Link>
             {userRole === 'doctor' && (
-              <Link to="/create-prescription">Create Prescription</Link>
+              <>
+                <Link to="/create-prescription">Create Prescription</Link>
+                <Link to="/drug-interactions">Drug Interactions</Link>
+              </>
             )}
             <Link to="/notifications">Notifications</Link>
             <button onClick={handleLogout} className="logout-btn">Logout</button>

@@ -35,10 +35,16 @@ app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/medication', medicationRoutes); // Add this line
 
-// Check for notifications every 30 seconds instead of every minute
-setInterval(checkAndCreateNotifications, 30000);
+// Add logging for notification checks
+setInterval(() => {
+  console.log(`[${new Date().toISOString()}] Running notification check...`);
+  checkAndCreateNotifications().catch(err => {
+    console.error('Notification check failed:', err);
+  });
+}, 30000); // Check every 30 seconds
 
-// Add an immediate check when server starts
+// Run initial check on server start
+console.log('Starting initial notification check...');
 checkAndCreateNotifications().catch(err => {
   console.error('Initial notification check failed:', err);
 });

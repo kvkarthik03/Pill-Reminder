@@ -43,6 +43,41 @@
   gap: 1rem;
 }
 
+.time-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.time-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.time-input-group label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.time-input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.selected-times {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #e3f2fd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #1976d2;
+}
+
 .checkbox-group {
   flex: 1;
   min-width: 200px;
@@ -132,4 +167,100 @@
 
 .remove-medicine-btn:hover {
   background-color: #D32F2F;
+}
+
+.time-input-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.time-input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 150px;
+}
+
+.add-time-btn {
+  padding: 8px 16px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-time-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.selected-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.time-tag {
+  background-color: #e3f2fd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.remove-time-btn {
+  background: none;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.remove-time-btn:hover {
+  color: #d32f2f;
+}
+
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 10px;
+}
+
+.time-slot {
+  background: #f8f8f8;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+  position: relative;
+}
+
+.time-slot label {
+  display: block;
+  margin-bottom: 8px;
+  color: #666;
+  font-weight: normal;
+}
+
+.time-slot input[type="time"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.selected-time {
+  display: block;
+  margin-top: 5px;
+  color: #4CAF50;
+  font-size: 0.9rem;
 }

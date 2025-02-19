@@ -14,7 +14,8 @@ const CreatePrescription = () => {
     drugName: '',
     dosage: '',
     whenToTake: 'after_meal',
-    timeToTake: ''
+    timeToTake: '',
+    newTime: ''
   };
 
   const [formData, setFormData] = useState({
@@ -95,17 +96,28 @@ const CreatePrescription = () => {
     }));
   };
 
-  const handleTimeCheckbox = (index, time) => {
+  const handleTimeChange = (index, time) => {
+    const formattedTime = time.replace('T', ' ').substring(0, 5); // Convert to HH:mm format
+    handleMedicineChange(index, 'timeToTake', formattedTime);
+  };
+
+  const addTimeToMedicine = (index) => {
     const medicine = formData.medicines[index];
-    const times = medicine.timeToTake.split(',').filter(t => t);
+    const currentTimes = medicine.timeToTake ? medicine.timeToTake.split(',').filter(t => t.trim()) : [];
+    const timesSet = new Set(currentTimes);
     
-    if (times.includes(time)) {
-      const newTimes = times.filter(t => t !== time);
-      handleMedicineChange(index, 'timeToTake', newTimes.join(','));
-    } else {
-      const newTimes = [...times, time];
-      handleMedicineChange(index, 'timeToTake', newTimes.join(','));
+    if (medicine.newTime && !timesSet.has(medicine.newTime)) {
+      const updatedTimes = [...currentTimes, medicine.newTime].sort();
+      handleMedicineChange(index, 'timeToTake', updatedTimes.join(','));
     }
+    // Clear the new time input
+    handleMedicineChange(index, 'newTime', '');
+  };
+
+  const removeTime = (medicineIndex, timeToRemove) => {
+    const medicine = formData.medicines[medicineIndex];
+    const times = medicine.timeToTake.split(',').filter(t => t.trim() !== timeToRemove);
+    handleMedicineChange(medicineIndex, 'timeToTake', times.join(','));
   };
 
   const whenToTakeOptions = [
@@ -123,11 +135,30 @@ const CreatePrescription = () => {
     { value: '30', label: '1 month' }
   ];
 
-  const timeOptions = [
-    { value: '09:00', label: 'Morning (9:00 AM)' },
-    { value: '14:00', label: 'Afternoon (2:00 PM)' },
-    { value: '20:00', label: 'Night (8:00 PM)' }
+  const timeCategories = [
+    { id: 'morning', label: 'Morning Time', placeholder: 'Enter morning time' },
+    { id: 'afternoon', label: 'Afternoon Time', placeholder: 'Enter afternoon time' },
+    { id: 'evening', label: 'Night Time', placeholder: 'Enter night time' }
   ];
+
+  const updateMedicineTime = (index, value, timeCategory) => {
+    const medicine = formData.medicines[index];
+    const times = medicine.timeToTake ? medicine.timeToTake.split(',').filter(t => t.trim()) : [];
+    let updatedTimes = times.filter(t => {
+      // Keep times from other categories
+      const [hours] = t.split(':').map(Number);
+      if (timeCategory === 'morning' && (hours >= 5 && hours < 12)) return false;
+      if (timeCategory === 'afternoon' && (hours >= 12 && hours < 17)) return false;
+      if (timeCategory === 'evening' && (hours >= 17 || hours < 5)) return false;
+      return true;
+    });
+
+    if (value) {
+      updatedTimes.push(value);
+    }
+
+    handleMedicineChange(index, 'timeToTake', updatedTimes.sort().join(','));
+  };
 
   return (
     <div className="create-prescription-container">
@@ -194,20 +225,24 @@ const CreatePrescription = () => {
 
             <div className="form-group">
               <label>Time to Take</label>
-              <div className="time-inputs">
-                {timeOptions.map(option => (
-                  <div key={option.value} className="checkbox-group">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={medicine.timeToTake.includes(option.value)}
-                        onChange={() => handleTimeCheckbox(index, option.value)}
-                      />
-                      {option.label}
-                    </label>
+              <div className="time-inputs-grid">
+                {timeCategories.map(category => (
+                  <div key={category.id} className="time-input-group">
+                    <label>{category.label}</label>
+                    <input
+                      type="time"
+                      className="time-input"
+                      onChange={(e) => updateMedicineTime(index, e.target.value, category.id)}
+                      placeholder={category.placeholder}
+                    />
                   </div>
                 ))}
               </div>
+              {medicine.timeToTake && (
+                <div className="selected-times">
+                  <p>Selected times: {medicine.timeToTake.split(',').join(', ')}</p>
+                </div>
+              )}
             </div>
 
             {index > 0 && (

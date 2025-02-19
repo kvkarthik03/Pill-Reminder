@@ -1,7 +1,7 @@
 .drug-interaction-container {
   max-width: 800px;
   margin: 2rem auto;
-  padding: 20px;
+  padding: 2rem;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -76,18 +76,99 @@
 }
 
 .result-container {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f8f8f8;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f8f8;
   border-radius: 4px;
   border-left: 4px solid #4CAF50;
 }
 
 .disclaimer {
-  margin-top: 20px;
-  padding: 10px;
-  background: #fff3e0;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #fff3e0;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.checker-description {
+  color: #666;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.drug-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.input-group input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.check-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.check-button:hover {
+  background-color: #45a049;
+}
+
+.check-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  border-left: 4px solid #c62828;
+}
+
+.interaction-details {
+  margin-top: 1rem;
+}
+
+.interaction-details h4 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.interaction-details p {
+  margin: 0.75rem 0;
+  line-height: 1.5;
+  color: #444;
+}
+
+.disclaimer p {
+  margin: 0;
   color: #666;
 }

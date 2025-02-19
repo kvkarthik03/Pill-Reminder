@@ -1,0 +1,30 @@
+.profile-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.profile-card {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-card h2 {
+  color: #4CAF50;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.profile-info p {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+}
+
+.profile-info strong {
+  color: #333;
+  display: inline-block;
+  width: 150px;
+}

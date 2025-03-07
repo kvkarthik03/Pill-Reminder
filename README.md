@@ -1,4 +1,4 @@
-# Medical Prescription Management System
+# Pill Reminder Application with Doctor Prescription Integration
 
 A web application for managing prescriptions and medications, featuring an AI-powered medical assistant.
 

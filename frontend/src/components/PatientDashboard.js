@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import '../styles/Dashboard.css';
+import MedicalChatBot from './MedicalChatBot';
 
 const PatientDashboard = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -157,6 +158,7 @@ const PatientDashboard = () => {
           </div>
         </div>
       </div>
+      <MedicalChatBot prescriptions={prescriptions} />
     </div>
   );
 };

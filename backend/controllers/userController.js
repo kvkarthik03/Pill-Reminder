@@ -1,5 +1,6 @@
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
+const Prescription = require('../models/Prescription');
+const bcrypt = require('bcrypt');  // Changed back to bcrypt
 const jwt = require('jsonwebtoken');
 
 // Register a new user
@@ -31,9 +32,25 @@ const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user._id, role: user.role }, 'secret', { expiresIn: '1h' });
-    res.json({ token });
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // Send both token and user data
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -48,4 +65,22 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile };
+const getDoctorProfile = async (req, res) => {
+  try {
+    const doctor = await User.findById(req.user.id).select('-password');
+    
+    const profile = {
+        name: doctor.name,
+        email: doctor.email,
+        licenseNumber: doctor.licenseNumber || 'Not set',
+        specialty: doctor.specialty || 'General Practice'
+    };
+
+    res.json(profile);
+  } catch (error) {
+    console.error('Doctor profile error:', error);
+    res.status(500).json({ message: 'Error fetching doctor profile' });
+  }
+};
+
+module.exports = { registerUser, loginUser, getUserProfile, getDoctorProfile };

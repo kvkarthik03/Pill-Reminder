@@ -18,6 +18,28 @@ const handleResponse = async (response) => {
   return data;
 };
 
+const post = async (endpoint, data) => {
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
 export const api = {
   login: async (credentials) => {
     try {
@@ -64,10 +86,20 @@ export const api = {
   },
 
   getDoctorProfile: async () => {
-    const response = await fetch(`${API_URL}/doctor-profile`, {
-      headers: getHeaders(),
-    });
-    return response.json();
+    try {
+      const response = await fetch(`${API_URL}/users/doctor-profile`, {
+        headers: getHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch doctor profile');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching doctor profile:', error);
+      throw error;
+    }
   },
 
   getPatientProfile: async () => {
@@ -161,6 +193,39 @@ export const api = {
       return handleResponse(response);
     } catch (error) {
       console.error('Error fetching medication history:', error);
+      throw error;
+    }
+  },
+
+  chat: async (message, prescriptions) => {
+    try {
+      const response = await fetch(`${API_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ 
+          message, 
+          prescriptions: prescriptions || [] 
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: `HTTP error! status: ${response.status}`
+        }));
+        throw new Error(errorData.message || `Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data.response) {
+        throw new Error('Invalid response format from server');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Chat API Error:', error);
       throw error;
     }
   }

@@ -33,6 +33,7 @@ function App() {
               <ProtectedRoute path="/create-prescription" component={CreatePrescription} roleRequired="doctor" />
               <ProtectedRoute path="/notifications" component={NotificationList} />
               <ProtectedRoute path="/drug-interactions" component={DrugInteractionChecker} roleRequired="doctor" />
+              <ProtectedRoute path="/doctor/profile" component={DoctorProfile} roleRequired="doctor" />
               <Route path="*">
                 <Redirect to="/" />
               </Route>

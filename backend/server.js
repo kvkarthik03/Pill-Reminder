@@ -63,5 +63,10 @@ mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected'))
+.then(() => {
+    console.log('MongoDB connected');
+    // Start notification scheduler
+    setInterval(checkAndCreateNotifications, 30000); // Check every minute
+    console.log('Notification scheduler started');
+})
 .catch(err => console.error('MongoDB connection error:', err));

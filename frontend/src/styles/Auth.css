@@ -54,3 +54,16 @@
   border-radius: 4px;
   margin-bottom: 1rem;
 }
+
+.password-requirements {
+    color: #d32f2f;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    padding: 4px;
+    background-color: #ffebee;
+    border-radius: 4px;
+}
+
+.password-field {
+    margin-bottom: 1rem;
+}

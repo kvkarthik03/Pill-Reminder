@@ -3,6 +3,19 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { api } from '../services/api';
 import '../styles/CreatePrescription.css';
 
+const calculateTimeRange = (category) => {
+  switch (category) {
+    case 'morning':
+      return { min: '05:00', max: '11:59' };
+    case 'afternoon':
+      return { min: '12:00', max: '16:59' };
+    case 'evening':
+      return { min: '17:00', max: '23:59' };
+    default:
+      return { min: '00:00', max: '23:59' };
+  }
+};
+
 const CreatePrescription = () => {
   const history = useHistory();
   const location = useLocation();
@@ -160,6 +173,11 @@ const CreatePrescription = () => {
     handleMedicineChange(index, 'timeToTake', updatedTimes.sort().join(','));
   };
 
+  const getTimeCategoryLabel = (category) => {
+    const ranges = calculateTimeRange(category);
+    return `${category.charAt(0).toUpperCase() + category.slice(1)} (${ranges.min} - ${ranges.max})`;
+  };
+
   return (
     <div className="create-prescription-container">
       <h2>Create New Prescription</h2>
@@ -226,14 +244,30 @@ const CreatePrescription = () => {
             <div className="form-group">
               <label>Time to Take</label>
               <div className="time-inputs-grid">
-                {timeCategories.map(category => (
-                  <div key={category.id} className="time-input-group">
-                    <label>{category.label}</label>
+                {['morning', 'afternoon', 'evening'].map(category => (
+                  <div key={category} className="time-input-group">
+                    <label>{getTimeCategoryLabel(category)}</label>
                     <input
                       type="time"
                       className="time-input"
-                      onChange={(e) => updateMedicineTime(index, e.target.value, category.id)}
-                      placeholder={category.placeholder}
+                      min={calculateTimeRange(category).min}
+                      max={calculateTimeRange(category).max}
+                      onChange={(e) => {
+                        const time = e.target.value;
+                        if (time) {
+                          const [hours] = time.split(':').map(Number);
+                          const timeCategory = category;
+                          const range = calculateTimeRange(timeCategory);
+                          
+                          if (time >= range.min && time <= range.max) {
+                            updateMedicineTime(index, time, timeCategory);
+                          } else {
+                            alert(`Please select a time between ${range.min} and ${range.max} for ${timeCategory}`);
+                            e.target.value = '';
+                          }
+                        }
+                      }}
+                      placeholder={`Enter ${category} time`}
                     />
                   </div>
                 ))}

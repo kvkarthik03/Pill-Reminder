@@ -5,18 +5,56 @@ const jwt = require('jsonwebtoken');
 
 // Register a new user
 const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
   try {
+    const { email, role } = req.body;
+    
+    // Filter out empty fields based on role
+    const userData = Object.fromEntries(
+      Object.entries(req.body).filter(([_, value]) => value !== '')
+    );
+
+    // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword, role });
-    await user.save();
-    res.status(201).json({ message: 'User registered successfully' });
+
+    // Validate required fields based on role
+    if (role === 'doctor' && (!req.body.licenseNumber || !req.body.specialty || !req.body.hospital)) {
+      return res.status(400).json({ 
+        message: 'Missing required doctor fields: license number, specialty, or hospital name' 
+      });
+    }
+
+    // Create new user with filtered data
+    const user = new User(userData);
+    const savedUser = await user.save();
+
+    // Generate token
+    const token = jwt.sign(
+      { id: savedUser._id, role: savedUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // Return success response
+    res.status(201).json({
+      token,
+      user: {
+        id: savedUser._id,
+        name: savedUser.name,
+        email: savedUser.email,
+        role: savedUser.role
+      }
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Registration error:', error);
+    // Send more specific error message
+    res.status(500).json({ 
+      message: 'Registration failed', 
+      error: error.message,
+      details: error.errors // Include mongoose validation errors if any
+    });
   }
 };
 

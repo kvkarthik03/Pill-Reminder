@@ -7,20 +7,26 @@ const NotificationList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        setLoading(true);
-        const data = await api.getNotifications();
-        setNotifications(data);
-      } catch (err) {
-        setError('Failed to load notifications');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchNotifications = async () => {
+    try {
+      const data = await api.getNotifications();
+      setNotifications(data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load notifications');
+      console.error('Error fetching notifications:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchNotifications();
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const handleMarkAsRead = async (id) => {

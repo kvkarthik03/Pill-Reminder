@@ -11,36 +11,36 @@ const PatientDashboard = () => {
   const [error, setError] = useState(null);
   const [takenMedications, setTakenMedications] = useState(new Set());
 
+  const fetchData = async () => {
+    try {
+      const [prescriptionsData, remindersData, historyData] = await Promise.all([
+        api.getPrescriptions(),
+        api.getNotifications(),
+        api.getMedicationHistory()
+      ]);
+      setPrescriptions(prescriptionsData);
+      setReminders(remindersData);
+      setMedicationHistory(historyData);
+
+      // Update taken medications set
+      const today = new Date().toDateString();
+      const takenToday = new Set(
+        historyData
+          .filter(record => new Date(record.takenAt).toDateString() === today)
+          .map(record => `${record.prescriptionId._id || record.prescriptionId}-${record.drugName}`)
+      );
+      setTakenMedications(takenToday);
+    } catch (err) {
+      setError('Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [prescriptionsData, remindersData, historyData] = await Promise.all([
-          api.getPrescriptions(),
-          api.getNotifications(),
-          api.getMedicationHistory()
-        ]);
-        setPrescriptions(prescriptionsData);
-        setReminders(remindersData);
-        setMedicationHistory(historyData);
-
-        // Create a set of taken medications for today
-        const today = new Date().toDateString();
-        const takenToday = new Set(
-          historyData
-            .filter(record => new Date(record.takenAt).toDateString() === today)
-            .map(record => `${record.prescriptionId._id || record.prescriptionId}-${record.drugName}`)
-        );
-        setTakenMedications(takenToday);
-      } catch (err) {
-        setError('Failed to load data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-    // Set up reminder check interval
-    const interval = setInterval(fetchData, 60000); // Check every minute
+    // Poll for updates every 30 seconds
+    const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
 

@@ -10,24 +10,86 @@ const Signup = () => {
     password: '',
     role: 'patient',
     licenseNumber: '',
-    hospitalName: '',
-    specialization: '',
+    hospital: '',
+    specialty: '',
     gender: '',
     dateOfBirth: ''
   });
   const [error, setError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const history = useHistory();
+
+  const validatePassword = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length < minLength) {
+      return 'Password must be at least 8 characters long';
+    }
+    if (!hasUpperCase) {
+      return 'Password must contain at least one uppercase letter';
+    }
+    if (!hasLowerCase) {
+      return 'Password must contain at least one lowercase letter';
+    }
+    if (!hasNumbers) {
+      return 'Password must contain at least one number';
+    }
+    if (!hasSpecialChar) {
+      return 'Password must contain at least one special character';
+    }
+    return '';
+  };
+
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    setFormData({...formData, password});
+    setPasswordError(validatePassword(password));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate password before submission
+    const passwordValidationError = validatePassword(formData.password);
+    if (passwordValidationError) {
+      setError(passwordValidationError);
+      return;
+    }
+
     try {
+      // Basic validation only
+      if (formData.role === 'doctor') {
+        if (!formData.licenseNumber) {
+          setError('License Number is required');
+          return;
+        }
+      }
+
+      if (formData.role === 'patient') {
+        if (!formData.gender) {
+          setError('Please select a gender');
+          return;
+        }
+        if (!formData.dateOfBirth) {
+          setError('Please enter date of birth');
+          return;
+        }
+      }
+
+      // Send data directly without mapping/transforming
       const response = await api.signup(formData);
       if (response.token) {
         localStorage.setItem('token', response.token);
-        history.push(response.role === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard');
+        localStorage.setItem('userRole', response.user.role);
+        history.push(response.user.role === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard');
       }
     } catch (err) {
-      setError('Signup failed. Please try again.');
+      console.error('Signup error:', err);
+      setError(err.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -58,13 +120,16 @@ const Signup = () => {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={e => setFormData({...formData, password: e.target.value})}
-          required
-        />
+        <div className="password-field">
+          <input
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handlePasswordChange}
+            required
+          />
+          {passwordError && <div className="password-requirements">{passwordError}</div>}
+        </div>
 
         {formData.role === 'doctor' && (
           <>
@@ -73,34 +138,44 @@ const Signup = () => {
               placeholder="License Number"
               value={formData.licenseNumber}
               onChange={e => setFormData({...formData, licenseNumber: e.target.value})}
+              required
             />
             <input
               type="text"
-              placeholder="Hospital Name"
-              value={formData.hospitalName}
-              onChange={e => setFormData({...formData, hospitalName: e.target.value})}
+              placeholder="Specialty"
+              value={formData.specialty}
+              onChange={e => setFormData({...formData, specialty: e.target.value})}
+              required
             />
             <input
               type="text"
-              placeholder="Specialization"
-              value={formData.specialization}
-              onChange={e => setFormData({...formData, specialization: e.target.value})}
+              placeholder="Hospital"
+              value={formData.hospital}
+              onChange={e => setFormData({...formData, hospital: e.target.value})}
+              required
             />
           </>
         )}
 
         {formData.role === 'patient' && (
           <>
-            <input
-              type="text"
-              placeholder="Gender"
+            <select
               value={formData.gender}
               onChange={e => setFormData({...formData, gender: e.target.value})}
-            />
+              required
+            >
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+
             <input
               type="date"
               value={formData.dateOfBirth}
               onChange={e => setFormData({...formData, dateOfBirth: e.target.value})}
+              required
+              max={new Date().toISOString().split('T')[0]}
             />
           </>
         )}

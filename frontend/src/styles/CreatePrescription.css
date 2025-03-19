@@ -59,6 +59,27 @@
 .time-input-group label {
   font-size: 0.9rem;
   color: #666;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.time-input-group input[type="time"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.time-input-group input[type="time"]:invalid {
+  border-color: #f44336;
+}
+
+.time-input-group small {
+  display: block;
+  color: #666;
+  font-size: 0.8rem;
+  margin-top: 4px;
 }
 
 .time-input {

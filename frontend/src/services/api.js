@@ -63,12 +63,26 @@ export const api = {
   },
 
   signup: async (userData) => {
-    const response = await fetch(`${API_URL}/users/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    });
-    return response.json();
+    try {
+      console.log('Sending signup data:', userData); // Debug log
+      
+      const response = await fetch(`${API_URL}/users/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Signup failed');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
   },
 
   getProfile: async () => {

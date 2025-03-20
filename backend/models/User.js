@@ -15,8 +15,25 @@ const passwordValidator = (password) => {
            hasSpecialChar;
 };
 
+const nameValidator = (name) => {
+    // At least 2 characters, letters only (including spaces and dots for initials)
+    const nameRegex = /^[A-Za-z][A-Za-z\s.]{1,}$/;
+    return nameRegex.test(name) && name.length >= 2 && name.length <= 50;
+};
+
+const licenseNumberValidator = (number) => {
+    return /^\d{10}$/.test(number);
+};
+
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
+    name: { 
+        type: String, 
+        required: true,
+        validate: {
+            validator: nameValidator,
+            message: 'Name must be 2-50 characters long and contain only letters, spaces, and dots'
+        }
+    },
     email: { type: String, required: true, unique: true },
     password: { 
         type: String, 
@@ -36,7 +53,14 @@ const userSchema = new mongoose.Schema({
     // Doctor specific fields
     licenseNumber: {
         type: String,
-        required: function() { return this.role === 'doctor'; }
+        required: function() { return this.role === 'doctor'; },
+        validate: {
+            validator: function(v) {
+                if (this.role !== 'doctor') return true;
+                return licenseNumberValidator(v);
+            },
+            message: 'License Number must be exactly 10 digits'
+        }
     },
     specialty: {
         type: String,

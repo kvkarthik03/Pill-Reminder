@@ -17,6 +17,8 @@ const Signup = () => {
   });
   const [error, setError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [licenseError, setLicenseError] = useState('');
   const history = useHistory();
 
   const validatePassword = (password) => {
@@ -44,20 +46,64 @@ const Signup = () => {
     return '';
   };
 
+  const validateName = (name) => {
+    if (!name) return 'Name is required';
+    if (name.length < 2) return 'Name must be at least 2 characters long';
+    if (name.length > 50) return 'Name must be less than 50 characters';
+    if (!/^[A-Za-z][A-Za-z\s.]{1,}$/.test(name)) {
+      return 'Name can only contain letters, spaces, and dots';
+    }
+    return '';
+  };
+
+  const validateLicenseNumber = (license) => {
+    if (!license) return 'License Number is required';
+    if (!/^\d+$/.test(license)) return 'License Number must contain only digits';
+    if (license.length !== 10) return 'License Number must be exactly 10 digits';
+    return '';
+  };
+
   const handlePasswordChange = (e) => {
     const password = e.target.value;
     setFormData({...formData, password});
     setPasswordError(validatePassword(password));
   };
 
+  const handleNameChange = (e) => {
+    const name = e.target.value;
+    setFormData({...formData, name});
+    setNameError(validateName(name));
+  };
+
+  const handleLicenseChange = (e) => {
+    const license = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    setFormData({...formData, licenseNumber: license});
+    setLicenseError(validateLicenseNumber(license));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate name first
+    const nameValidationError = validateName(formData.name);
+    if (nameValidationError) {
+      setError(nameValidationError);
+      return;
+    }
+
     // Validate password before submission
     const passwordValidationError = validatePassword(formData.password);
     if (passwordValidationError) {
       setError(passwordValidationError);
       return;
+    }
+
+    if (formData.role === 'doctor') {
+      const licenseValidationError = validateLicenseNumber(formData.licenseNumber);
+      if (licenseValidationError) {
+        setError(licenseValidationError);
+        return;
+      }
     }
 
     try {
@@ -104,13 +150,16 @@ const Signup = () => {
           <option value="doctor">Doctor</option>
         </select>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={e => setFormData({...formData, name: e.target.value})}
-          required
-        />
+        <div className="input-field">
+          <input
+            type="text"
+            placeholder="Name"
+            value={formData.name}
+            onChange={handleNameChange}
+            required
+          />
+          {nameError && <div className="field-error">{nameError}</div>}
+        </div>
 
         <input
           type="email"
@@ -133,16 +182,20 @@ const Signup = () => {
 
         {formData.role === 'doctor' && (
           <>
+            <div className="input-field">
+              <input
+                type="text"
+                placeholder="License Number (10 digits)"
+                value={formData.licenseNumber}
+                onChange={handleLicenseChange}
+                maxLength={10}
+                required
+              />
+              {licenseError && <div className="field-error">{licenseError}</div>}
+            </div>
             <input
               type="text"
-              placeholder="License Number"
-              value={formData.licenseNumber}
-              onChange={e => setFormData({...formData, licenseNumber: e.target.value})}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Specialty"
+              placeholder="Specialization"
               value={formData.specialty}
               onChange={e => setFormData({...formData, specialty: e.target.value})}
               required

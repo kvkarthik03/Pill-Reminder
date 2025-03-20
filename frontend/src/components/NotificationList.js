@@ -1,32 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
+import { playNotificationSound } from '../utils/sound';
 import '../styles/NotificationList.css';
 
 const NotificationList = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const previousNotificationsRef = useRef([]);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false; // Component cleanup
+    };
+  }, []);
 
   const fetchNotifications = async () => {
     try {
       const data = await api.getNotifications();
+      
+      if (!mountedRef.current) return; // Don't update state if unmounted
+
+      // Check for new unread notifications
+      const newUnreadNotifications = data.filter(
+        notification => !notification.read && 
+        !previousNotificationsRef.current.find(
+          prev => prev._id === notification._id
+        )
+      );
+
+      // Play sound if there are new unread notifications
+      if (newUnreadNotifications.length > 0) {
+        playNotificationSound();
+      }
+
       setNotifications(data);
+      previousNotificationsRef.current = data;
       setError(null);
     } catch (err) {
-      setError('Failed to load notifications');
-      console.error('Error fetching notifications:', err);
+      if (mountedRef.current) { // Only update state if mounted
+        setError('Failed to load notifications');
+        console.error('Error fetching notifications:', err);
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
+    let intervalId;
     fetchNotifications();
-    // Poll for new notifications every 30 seconds
-    const interval = setInterval(fetchNotifications, 30000);
     
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
+    intervalId = setInterval(fetchNotifications, 30000);
+    return () => {
+      clearInterval(intervalId);
+      mountedRef.current = false;
+    };
   }, []);
 
   const handleMarkAsRead = async (id) => {

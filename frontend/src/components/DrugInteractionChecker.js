@@ -13,6 +13,45 @@ const DrugInteractionChecker = () => {
     return text.split('.').filter(Boolean).map(sentence => sentence.trim());
   };
 
+  const analyzeInteractionSeverity = (text) => {
+    const severeKeywords = ['severe', 'serious', 'dangerous', 'avoid', 'death', 'fatal'];
+    const moderateKeywords = ['moderate', 'caution', 'careful', 'monitor'];
+    const minorKeywords = ['mild', 'minor', 'slight'];
+
+    text = text.toLowerCase();
+
+    if (severeKeywords.some(word => text.includes(word))) {
+      return {
+        level: 'HIGH',
+        color: '#dc3545',
+        message: '⚠️ SEVERE INTERACTION DETECTED',
+        description: 'These medications have a severe interaction risk. Alternative medications should be considered.'
+      };
+    }
+    if (moderateKeywords.some(word => text.includes(word))) {
+      return {
+        level: 'MODERATE',
+        color: '#ffc107',
+        message: '⚠️ MODERATE INTERACTION DETECTED',
+        description: 'Use these medications together with caution. Monitor for side effects.'
+      };
+    }
+    if (minorKeywords.some(word => text.includes(word))) {
+      return {
+        level: 'MINOR',
+        color: '#28a745',
+        message: 'ℹ️ MINOR INTERACTION',
+        description: 'Minor interaction possible. Monitor for any unusual effects.'
+      };
+    }
+    return {
+      level: 'UNKNOWN',
+      color: '#17a2b8',
+      message: 'ℹ️ NO KNOWN INTERACTION',
+      description: 'Please review the detailed information below.'
+    };
+  };
+
   const handleCheckInteraction = async () => {
     if (!drug1 || !drug2) {
       setError("Please enter both drug names");
@@ -34,19 +73,61 @@ const DrugInteractionChecker = () => {
       if (data.results && data.results.length > 0) {
         const interactions = data.results[0].drug_interactions;
         if (interactions && interactions.length > 0) {
-          setResult(interactions[0]); // Taking first interaction text
+          const interactionText = interactions[0];
+          const severity = analyzeInteractionSeverity(interactionText);
+          setResult({
+            text: interactionText,
+            severity: severity
+          });
         } else {
-          setError("No drug interaction information found in the label.");
+          setError("No specific interaction information found in the FDA database.");
         }
       } else {
-        setError("No results found for these drugs.");
+        setError("No results found for these medications in the FDA database.");
       }
     } catch (error) {
       console.error("Error fetching data from openFDA:", error);
-      setError("Error fetching data from FDA database.");
+      setError("Error accessing FDA database. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderAnalysis = (analysis) => {
+    if (!analysis) return null;
+
+    const severityColors = {
+      'HIGH': '#dc3545',
+      'MODERATE': '#ffc107',
+      'SAFE': '#28a745',
+      'UNKNOWN': '#6c757d'
+    };
+
+    return (
+      <div 
+        className="interaction-analysis"
+        style={{
+          padding: '1rem',
+          marginBottom: '1rem',
+          borderRadius: '8px',
+          backgroundColor: `${severityColors[analysis.severity]}20`,
+          borderLeft: `4px solid ${severityColors[analysis.severity]}`,
+          marginTop: '1rem'
+        }}
+      >
+        <h4 style={{ color: severityColors[analysis.severity] }}>
+          {analysis.message}
+        </h4>
+        <p style={{ 
+          marginTop: '0.5rem', 
+          color: '#555',
+          fontSize: '0.9rem' 
+        }}>
+          <strong>Severity Level:</strong> {analysis.severity}<br/>
+          {analysis.severityDescription}
+        </p>
+      </div>
+    );
   };
 
   return (
@@ -94,10 +175,23 @@ const DrugInteractionChecker = () => {
 
       {result && (
         <div className="result-container">
-          <h3>Interaction Information</h3>
+          <div 
+            className="severity-banner"
+            style={{
+              backgroundColor: `${result.severity.color}20`,
+              borderLeft: `4px solid ${result.severity.color}`,
+              padding: '1rem',
+              marginBottom: '1rem',
+              borderRadius: '4px'
+            }}
+          >
+            <h3 style={{ color: result.severity.color }}>{result.severity.message}</h3>
+            <p>{result.severity.description}</p>
+          </div>
+
           <div className="interaction-details">
-            <h4>Between {drug1} and {drug2}:</h4>
-            {formatInteractionText(result).map((paragraph, index) => (
+            <h4>Detailed Information:</h4>
+            {formatInteractionText(result.text).map((paragraph, index) => (
               <p key={index}>{paragraph}.</p>
             ))}
           </div>

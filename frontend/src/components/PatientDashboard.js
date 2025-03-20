@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import '../styles/Dashboard.css';
 import MedicalChatBot from './MedicalChatBot';
-import { playNotificationSound } from '../utils/sound';
 
 const PatientDashboard = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -11,48 +10,20 @@ const PatientDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [takenMedications, setTakenMedications] = useState(new Set());
-  const previousRemindersRef = useRef([]);
-  const mountedRef = useRef(true);
 
   useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  const fetchData = async () => {
-    if (!mountedRef.current) return;
-    
-    try {
-      const [prescriptionsData, remindersData, historyData] = await Promise.all([
-        api.getPrescriptions(),
-        api.getNotifications(),
-        api.getMedicationHistory()
-      ]);
-
-      // Check for new unread reminders
-      const newUnreadReminders = remindersData.filter(
-        reminder => !reminder.read && 
-        !previousRemindersRef.current.find(
-          prev => prev._id === reminder._id
-        )
-      );
-
-      if (!mountedRef.current) return;
-      
-      // Play sound if there are new unread reminders
-      if (newUnreadReminders.length > 0) {
-        playNotificationSound();
-      }
-
-      // Only update state if component is mounted
-      if (mountedRef.current) {
+    const fetchData = async () => {
+      try {
+        const [prescriptionsData, remindersData, historyData] = await Promise.all([
+          api.getPrescriptions(),
+          api.getNotifications(),
+          api.getMedicationHistory()
+        ]);
         setPrescriptions(prescriptionsData);
         setReminders(remindersData);
-        previousRemindersRef.current = remindersData;
         setMedicationHistory(historyData);
 
-        // Update taken medications set
+        // Create a set of taken medications for today
         const today = new Date().toDateString();
         const takenToday = new Set(
           historyData
@@ -60,27 +31,17 @@ const PatientDashboard = () => {
             .map(record => `${record.prescriptionId._id || record.prescriptionId}-${record.drugName}`)
         );
         setTakenMedications(takenToday);
-      }
-    } catch (err) {
-      if (mountedRef.current) {
+      } catch (err) {
         setError('Failed to load data');
-      }
-    } finally {
-      if (mountedRef.current) {
+      } finally {
         setLoading(false);
       }
-    }
-  };
-
-  useEffect(() => {
-    let intervalId;
-    fetchData();
-    intervalId = setInterval(fetchData, 30000);
-    
-    return () => {
-      clearInterval(intervalId);
-      mountedRef.current = false;
     };
+
+    fetchData();
+    // Set up reminder check interval
+    const interval = setInterval(fetchData, 60000); // Check every minute
+    return () => clearInterval(interval);
   }, []);
 
   const handleMarkAsTaken = async (prescriptionId, drugName) => {

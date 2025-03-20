@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import '../styles/Auth.css';
 
@@ -32,33 +32,38 @@ const Login = () => {
   return (
     <div className="auth-container">
       <form onSubmit={handleSubmit} className="auth-form">
-        <h2>Login</h2>
+        <h2>Welcome Back</h2>
         {error && <div className="error-message">{error}</div>}
-        <div className="form-group">
-          <label>Email</label>
+        
+        <div className="input-group">
           <input
             type="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isLoading}
-            placeholder="Enter your email"
           />
         </div>
-        <div className="form-group">
-          <label>Password</label>
+
+        <div className="input-group">
           <input
             type="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={isLoading}
-            placeholder="Enter your password"
           />
         </div>
+
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
+
+        <div className="auth-switch">
+          Don't have an account? <Link to="/signup">Sign Up</Link>
+        </div>
       </form>
     </div>
   );

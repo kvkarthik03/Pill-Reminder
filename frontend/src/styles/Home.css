@@ -46,3 +46,150 @@
   color: #4CAF50;
   border: 2px solid #4CAF50;
 }
+
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 2rem;
+}
+
+.hero-section {
+  text-align: center;
+  padding: 4rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  animation: fadeInDown 0.8s ease;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  color: #7f8c8d;
+  margin-bottom: 3rem;
+  animation: fadeInUp 0.8s ease;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  /* Changed from auto-fit to exactly 2 columns */
+  gap: 2rem;
+  margin: 4rem auto;
+  max-width: 800px;  /* Reduced from 1200px for better layout with 2 cards */
+  animation: fadeIn 1s ease;
+}
+
+.feature-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  color: #3498db;
+  margin-bottom: 1rem;
+}
+
+.feature-title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.feature-description {
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+.cta-section {
+  text-align: center;
+  margin: 4rem auto;
+  animation: fadeIn 1.2s ease;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.auth-button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-btn {
+  background: #3498db;
+  color: white;
+}
+
+.signup-btn {
+  background: white;
+  color: #3498db;
+  border: 2px solid #3498db;
+}
+
+.auth-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;  /* Single column on mobile */
+    max-width: 400px;
+  }
+}

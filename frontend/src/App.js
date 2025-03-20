@@ -15,7 +15,16 @@ import PatientProfile from './components/PatientProfile';
 import DrugInteractionChecker from './components/DrugInteractionChecker';
 import './styles/global.css';
 
-function App() {
+const App = () => {
+  const isAuthenticated = !!localStorage.getItem('token');
+  const userRole = localStorage.getItem('userRole');
+
+  // Redirect helper function
+  const getHomeRedirect = () => {
+    if (!isAuthenticated) return '/';
+    return userRole === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard';
+  };
+
   return (
     <ErrorBoundary>
       <Router>
@@ -23,7 +32,14 @@ function App() {
           <Navigation />
           <div className="container">
             <Switch>
-              <Route exact path="/" component={Home} />
+              {/* Redirect root path based on auth state */}
+              <Route exact path="/" render={() => {
+                return isAuthenticated ? (
+                  <Redirect to={getHomeRedirect()} />
+                ) : (
+                  <Home />
+                );
+              }} />
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
               <ProtectedRoute exact path="/doctor-profile" component={DoctorProfile} roleRequired="doctor" />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import '../styles/Auth.css';
 
@@ -142,13 +142,23 @@ const Signup = () => {
   return (
     <div className="auth-container">
       <form onSubmit={handleSubmit} className="auth-form">
-        <h2>Sign Up</h2>
+        <h2>Create Account</h2>
         {error && <div className="error-message">{error}</div>}
         
-        <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
-          <option value="patient">Patient</option>
-          <option value="doctor">Doctor</option>
-        </select>
+        <div className="role-selector">
+          <div 
+            className={`role-option ${formData.role === 'patient' ? 'selected' : ''}`}
+            onClick={() => setFormData({...formData, role: 'patient'})}
+          >
+            Patient
+          </div>
+          <div 
+            className={`role-option ${formData.role === 'doctor' ? 'selected' : ''}`}
+            onClick={() => setFormData({...formData, role: 'doctor'})}
+          >
+            Doctor
+          </div>
+        </div>
 
         <div className="input-field">
           <input
@@ -234,6 +244,10 @@ const Signup = () => {
         )}
 
         <button type="submit">Sign Up</button>
+
+        <div className="auth-switch">
+          Already have an account? <Link to="/login">Login</Link>
+        </div>
       </form>
     </div>
   );

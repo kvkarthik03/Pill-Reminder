@@ -44,18 +44,57 @@ const DoctorDashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Doctor Dashboard</h1>
-        <Link to="/create-prescription" className="create-btn">Create New Prescription</Link>
+        <h1>Doctor's Dashboard</h1>
+        <p>Manage your patients and prescriptions</p>
       </div>
 
       <div className="dashboard-grid">
         <div className="dashboard-card">
+          <h2>My Patients</h2>
+          <input
+            type="text"
+            placeholder="Search patients..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          {patients.length === 0 ? (
+            <div className="empty-state">
+              <i className="far fa-user"></i>
+              <p>No patients registered</p>
+            </div>
+          ) : (
+            <div className="patients-list">
+              {filteredPatients.length === 0 ? (
+                <p>No patients found</p>
+              ) : (
+                filteredPatients.map(patient => (
+                  <div key={patient._id} className="patient-item">
+                    <h3>{patient.name}</h3>
+                    <p>Email: {patient.email}</p>
+                    <button 
+                      onClick={() => history.push(`/create-prescription?patientId=${patient._id}`)}
+                      className="btn-primary"
+                    >
+                      Create Prescription
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="dashboard-card">
           <h2>Recent Prescriptions</h2>
-          <div className="prescription-list">
-            {prescriptions.length === 0 ? (
-              <p>No prescriptions found</p>
-            ) : (
-              prescriptions.map(prescription => (
+          {prescriptions.length === 0 ? (
+            <div className="empty-state">
+              <i className="far fa-file-medical"></i>
+              <p>No prescriptions created yet</p>
+            </div>
+          ) : (
+            <div className="prescription-list">
+              {prescriptions.map(prescription => (
                 <div key={prescription._id} className="prescription-item">
                   <h3>Patient: {prescription.patientId?.name || 'Unknown'}</h3>
                   <p><strong>Prescribed on:</strong> {new Date(prescription.createdAt).toLocaleDateString()}</p>
@@ -75,37 +114,20 @@ const DoctorDashboard = () => {
                     <p><strong>Notes:</strong> {prescription.notes}</p>
                   )}
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="dashboard-card">
-          <h2>My Patients</h2>
-          <input
-            type="text"
-            placeholder="Search patients..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          <div className="patients-list">
-            {filteredPatients.length === 0 ? (
-              <p>No patients found</p>
-            ) : (
-              filteredPatients.map(patient => (
-                <div key={patient._id} className="patient-item">
-                  <h3>{patient.name}</h3>
-                  <p>Email: {patient.email}</p>
-                  <button 
-                    onClick={() => history.push(`/create-prescription?patientId=${patient._id}`)}
-                    className="btn-primary"
-                  >
-                    Create Prescription
-                  </button>
-                </div>
-              ))
-            )}
+          <h2>Quick Actions</h2>
+          <div className="action-buttons">
+            <button 
+              className="btn-primary"
+              onClick={() => history.push('/create-prescription')}
+            >
+              Create New Prescription
+            </button>
           </div>
         </div>
       </div>
